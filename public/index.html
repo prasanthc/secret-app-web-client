@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="secretApp">
+
+<head>
+    <meta charset="utf-8">
+
+    <base href="/">
+    <title>Secret App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="http://bootswatch.com/superhero/bootstrap.css" media="screen"> -->
+    <link rel="stylesheet" href="http://bootswatch.com/assets/css/bootswatch.min.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
+      <script src="../bower_components/respond/dest/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a href="" class="navbar-brand">Home</a>
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse" id="navbar-main">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <!-- <input type="text" class="form-control" placeholder="Search" ng-model="searchText"> -->
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div ng-view></div>
+
+        <script type="text/ng-template" id="post-secrets.html">
+            <div class="row">
+                <form name="postForm" ng-submit="toAddSecret()">
+                    <div class="col-lg-2">
+                        <input type="text" class="form-control" ng-model="nickName" placeholder="nickname" autocomplete="off" required>
+                    </div>
+                    <div class="col-lg-9">
+                        <input type="text" class="form-control" ng-model="secretMessage" placeholder="whats your secret..." autocomplete="off" required>
+                    </div>
+                    <div class="col-lg-1">
+                        <div class="pull-right">
+                            <button class="btn btn-success" type="submit" ng-disabled="postForm.$invalid">Post</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-5">
+                    <h2>Revealed
+                        <ng-pluralize count="secrets.length" when="secretForms"></ng-pluralize>&nbsp;so far..</h2>
+                </div>
+
+                <div class="col-lg-2">
+                    <h2>
+                        <select class="form-control" ng-model="sortByTag" ng-change="toSort()" ng-options="s for s in sortByTags">
+                            <option value="">-- No Sort --</option>
+                        </select>
+                    </h2>
+                </div>
+                <div class="col-lg-3">
+                    <h2>
+                        <div class="btn-group">
+                            <button class="btn btn-primary btn-xs" ng-model="radioSortOrder" ng-change="toSort()" btn-radio="'asc'">Asc
+                            </button>
+                            <button class="btn btn-primary btn-xs" ng-model="radioSortOrder" ng-change="toSort()" btn-radio="'desc'">Desc
+                            </button>
+                        </div>
+                    </h2>
+                </div>
+                <div class="col-lg-2">
+                    <div class="pull-right">
+                        <h2>
+                            <button class="btn btn-success" ng-click="openModaltoSearchSecrets('lg')">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div ng-repeat="secret in secrets | filter:searchText">
+                        <div class="bs-component">
+                            <div class="alert alert-danger">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <p class="">{{"#" + secret.id + " "}}</p>
+                                        <h1>{{secret.message}}</h1>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <span>
+                                            posted {{secret.post_date | fromNow}} by {{" " + secret.user}}, location: {{" " + secret.post_location}}
+                                        </span>
+                                        <span class="pull-right">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                            <span>
+                                                <a ng-click="openModaltoUpdateSecret(secret)" href="">Edit</a>
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                                <a ng-click="toDeleteSecret(secret.id)" href="">Delete</a>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <pagination ng-click="pageClick()" ng-model="currentPage" boundary-links="true" items-per-page="itemsPerPage" total-items="totalItems" ng-model="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
+                </div>
+            </div>
+            <pre>The selected page no: {{currentPage}}</pre>
+        </script>
+
+        <script type="text/ng-template" id="searchModalContent.html">
+            <form name="modalForm" ng-submit="ok()" novalidate>
+                <div class="modal-header">
+                    <h3 class="modal-title">Search!</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h4>Search by..</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <input class="form-control" type="text" ng-model="items.id" placeholder="id" autocomplete="off">
+                            </div>
+                            <div class="col-lg-5">
+                                <input class="form-control" type="text" ng-model="items.user" placeholder="user" autocomplete="off">
+                            </div>
+                            <div class="col-lg-5">
+                                <input class="form-control" type="text" ng-model="items.post_location" placeholder="location" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit" type="submit" ng-disabled="modalForm.$invalid">Search</button>
+                    <button class="btn btn-warning" ng-click="cancel()">Close</button>
+                </div>
+            </form>
+        </script>
+
+
+        <script type="text/ng-template" id="editModalContent.html">
+            <form name="modalForm" ng-submit="ok()" novalidate>
+                <div class="modal-header">
+                    <h3 class="modal-title">Update Secret!</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-3">
+                                Nick Name:
+                            </div>
+                            <div class="col-lg-9">
+                                <input class="form-control" type="text" ng-model="items.secretUser" autocomplete="off" required>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-lg-3">
+                                Secret Message:
+                            </div>
+                            <div class="col-lg-9">
+                                <textarea class="form-control" rows="3" ng-model="items.secretMessage" required></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                {{result}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit" type="submit" ng-disabled="modalForm.$invalid">Update</button>
+                    <button class="btn btn-warning" ng-click="cancel()">Close</button>
+                </div>
+            </form>
+        </script>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/angular.min.js"></script>
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> -->
+    <script src="http://bootswatch.com/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="http://bootswatch.com/assets/js/bootswatch.js"></script>
+    <script src="js/ui-bootstrap-tpls-0.11.2.min.js"></script>
+    <script src="js/angular-route.min.js"></script>
+
+    <script src="js/moment.min.js"></script>
+    <script src="myjs/app.js"></script>
+    <script src="myjs/controller.js"></script>
+    <script src="myjs/factory.js"></script>
+</body>
+
+</html>

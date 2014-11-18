@@ -1,0 +1,15 @@
+{
+  "name": "SecretApp",
+  "version": "1.0.0",
+  "description": "post your secrets anonymously",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "prasanthc",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.10.1",
+    "mysql-activerecord": "^0.8.6"
+  }
+}
