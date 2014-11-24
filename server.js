@@ -11,7 +11,7 @@ app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res) {})
 
-//some changes to test
+
 var server = app.listen(port, ipaddress, function() {
     // var host = server.address().address
     // var port = server.address().port
