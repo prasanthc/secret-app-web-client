@@ -5,7 +5,7 @@ secretApp.controller('homeCtrl', function($scope, Secret, $modal, $log, $routePa
     };
 
     $scope.currentPage = 1;
-    $scope.totalItems = 44;
+    $scope.totalItems = 0;
     $scope.itemsPerPage = 5;
 
     $scope.secretForms = {
@@ -14,16 +14,24 @@ secretApp.controller('homeCtrl', function($scope, Secret, $modal, $log, $routePa
         other: '{} secrets'
     };
 
-    $scope.radioSortOrder = 'asc';
+    $scope.radioSortOrder = 'desc';
 
     $scope.sortByTags = ['ID', 'Posted By', 'Posted Date', 'Location'];
 
+    $scope.resultInfos = {
+        homePage: "So far, revealed ",
+        searchPage: "Search found: "
+    }
 
     $scope.init = function() {
-        // $scope.retrieveAllSecrets();
-        // $scope.retrieveFiveSecrets();
+        $scope.hideClearSearch = true;
+        $scope.resultInfo = $scope.resultInfos.homePage;
         retrieveFiveSecrets();
     };
+
+    $scope.toReloadPage = function() {
+        $window.location.reload();
+    }
 
     $scope.pageClick = function() {
         retrieveFiveSecrets();
@@ -52,22 +60,36 @@ secretApp.controller('homeCtrl', function($scope, Secret, $modal, $log, $routePa
         return retVal;
     }
 
+
+
     function retrieveFiveSecrets() {
         var record = {
             pageNo: $scope.currentPage
         }
+
+
         if ($scope.sortByTag) {
             var tempSortByTag = sortByTagChange($scope.sortByTag);
             record.orderBy = {
                 field: tempSortByTag,
                 ascOrDesc: $scope.radioSortOrder
             }
+        } else {
+            //sort by posted_date for home page 
+            record.orderBy = {
+                field: 'id',
+                ascOrDesc: $scope.radioSortOrder
+            }
         }
         if ($scope.searchByTag) {
+            $scope.resultInfo = $scope.resultInfos.searchPage;
+            $scope.hideClearSearch = false;
             record.searchTag = $scope.searchByTag;
         }
+        console.log(JSON.stringify(record));
         Secret.getFiveSecrets(record).success(function(data) {
             if (data.result) {
+                $scope.totalItems = data.totalCount;
                 $scope.secrets = data.result;
             }
         }).error(function(error) {
@@ -91,17 +113,18 @@ secretApp.controller('homeCtrl', function($scope, Secret, $modal, $log, $routePa
                 message: $scope.secretMessage,
                 user: $scope.nickName,
                 post_date: '',
-                post_location: 'New York'
+                post_location: 'Unknown'
             }
         };
 
+        $scope.nickName = "";
+        $scope.secretMessage = "";
         Secret.createSecret(record).success(function(data) {
             if (data.result) {
                 $scope.result = data.result;
                 alert('posted successfully');
                 retrieveFiveSecrets();
-                $scope.nickName = "";
-                $scope.secretMessage = "";
+
             }
 
         }).error(function(error) {
@@ -179,7 +202,7 @@ secretApp.controller('homeCtrl', function($scope, Secret, $modal, $log, $routePa
             };
 
             Secret.updateSecret(record).success(function(data) {
-                if (data.result) {                    
+                if (data.result) {
                     retrieveFiveSecrets();
                 }
             }).error(function(error) {
@@ -213,36 +236,7 @@ secretApp.filter('fromNow', function() {
 });
 
 
-secretApp.controller('searchCtrl', ['$scope, $log', function($scope, $log) {
+secretApp.controller('userCtrl', ['$scope, $log, $routeParams', function($scope, $log, $routeParams) {
 
-    $scope.toSearch() = function() {
-        retrieveFiveSecrets(sTag)
-    }
-
-    function retrieveFiveSecrets(sTag) {
-
-        var record = {
-            pageNo: $scope.currentPage
-        }
-        if ($scope.sortByTag) {
-            var tempSortByTag = sortByTagChange($scope.sortByTag);
-            record.orderBy = {
-                field: tempSortByTag,
-                ascOrDesc: $scope.radioSortOrder
-            }
-        }
-
-        if (sTag) {
-            record.searchTag = sTag;
-        }
-
-        Secret.getFiveSecrets(record).success(function(data) {
-            if (data.result) {
-                $scope.secrets = data.result;
-                $scope.tester += tempValue;
-            }
-        }).error(function(error) {
-            alert('Something went wrong:' + error);
-        })
-    }
+    $scope.userName = $routeParams.userName
 }])

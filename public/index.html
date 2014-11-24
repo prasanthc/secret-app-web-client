@@ -9,7 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <!-- <link rel="stylesheet" href="http://bootswatch.com/superhero/bootstrap.css" media="screen"> -->
+     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootswatch/3.3.0/superhero/bootstrap.min.css" media="screen">
     <link rel="stylesheet" href="http://bootswatch.com/assets/css/bootswatch.min.css">
+
+    
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="../bower_components/html5shiv/dist/html5shiv.js"></script>
@@ -21,7 +24,7 @@
     <div class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a href="" class="navbar-brand">Home</a>
+                <a href="" ng-click="toReloadPage()" class="navbar-brand">Home</a>
                 <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -61,8 +64,9 @@
 
             <div class="row">
                 <div class="col-lg-5">
-                    <h2>Revealed
-                        <ng-pluralize count="secrets.length" when="secretForms"></ng-pluralize>&nbsp;so far..</h2>
+                    <h2>{{resultInfo}}
+                        <ng-pluralize count="totalItems" when="secretForms"></ng-pluralize>
+                    </h2>
                 </div>
 
                 <div class="col-lg-2">
@@ -72,7 +76,7 @@
                         </select>
                     </h2>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <h2>
                         <div class="btn-group">
                             <button class="btn btn-primary btn-xs" ng-model="radioSortOrder" ng-change="toSort()" btn-radio="'asc'">Asc
@@ -83,9 +87,20 @@
                     </h2>
                 </div>
                 <div class="col-lg-2">
+
+                    <div class="pull-right" ng-hide=hideClearSearch>
+                        <h2>
+                            <a href="#" ng-click="toReloadPage()">
+                                <span class="badge">clear search</span>
+                            </a>
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="col-lg-1">
                     <div class="pull-right">
                         <h2>
-                            <button class="btn btn-success" ng-click="openModaltoSearchSecrets('lg')">
+                            <button class="btn btn-info" ng-click="openModaltoSearchSecrets('lg')">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>
                         </h2>
@@ -130,7 +145,11 @@
                     <pagination ng-click="pageClick()" ng-model="currentPage" boundary-links="true" items-per-page="itemsPerPage" total-items="totalItems" ng-model="currentPage" class="pagination-sm" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></pagination>
                 </div>
             </div>
-            <pre>The selected page no: {{currentPage}}</pre>
+        </script>
+
+        <script type="text/ng-template" id="user-page.html">
+            {{"Hello"}}
+            <h2>welcome, {{userName}}</h2>
         </script>
 
         <script type="text/ng-template" id="searchModalContent.html">
@@ -169,7 +188,8 @@
         <script type="text/ng-template" id="editModalContent.html">
             <form name="modalForm" ng-submit="ok()" novalidate>
                 <div class="modal-header">
-                    <h3 class="modal-title">Update Secret!</h3>
+                    <h3 class="modal-title">Update Secret!
+                    </h3>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid">

@@ -7,8 +7,8 @@ secretApp.config(['$routeProvider', '$locationProvider', '$httpProvider', functi
             templateUrl: 'post-secrets.html',
             controller: 'homeCtrl'
         })
-        .when('/search', {
-            templateUrl: 'search-page.html',
-            controller: 'searchCtrl'
+        .when('/user:userName', {
+            templateUrl: 'user-page.html',
+            controller: 'userCtrl'
         })
 }])

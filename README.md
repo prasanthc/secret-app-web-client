@@ -1,4 +1,4 @@
 SecretApp
 =========
 
-an app to post your secrets
+a web client to post your secrets
